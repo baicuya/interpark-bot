@@ -79,6 +79,14 @@ python interpark_bot.py
 | `mode` | 选时间方式 | `from top to bottom` / `from bottom to top` / `random` |
 | `time_keyword` | 时间关键字（留空选第一个） | `19:00` 或 `晚上7点` |
 
+### seat_select (座位区域选择)
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `enable` | 是否启用自动选区 | `true` / `false` |
+| `mode` | 匹配顺序 | `from top to bottom` / `from bottom to top` / `random` |
+| `keyword` | 座位关键字 | `前排` / `A区` / `"前排","A区"` |
+
 ## 个人信息（必填）
 
 | 字段 | 说明 |

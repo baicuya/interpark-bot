@@ -23,6 +23,11 @@
         "mode": "from top to bottom",
         "time_keyword": ""
     },
+    "seat_select": {
+        "enable": false,
+        "mode": "from top to bottom",
+        "keyword": ""
+    },
     "keyword_exclude": "",
     "user_name": "",
     "user_date_of_birth_year": "",

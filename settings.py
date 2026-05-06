@@ -67,6 +67,10 @@ def load_translate():
     en_us["time_select_order"] = 'Time select order'
     en_us["time_keyword"] = 'Time Keyword'
 
+    en_us["seat_auto_select"] = 'Seat Area Auto Select'
+    en_us["seat_select_order"] = 'Seat select order'
+    en_us["seat_keyword"] = 'Seat Keyword'
+
     en_us["keyword_exclude"] = 'Keyword Exclude'
 
     en_us["user_info"] = "Payer Info"
@@ -136,6 +140,10 @@ def load_translate():
     zh_tw["time_auto_select"] = '時間自動點選'
     zh_tw["time_select_order"] = '時間排序方式'
     zh_tw["time_keyword"] = '時間關鍵字'
+
+    zh_tw["seat_auto_select"] = '座位區域自動選擇'
+    zh_tw["seat_select_order"] = '座位排序方式'
+    zh_tw["seat_keyword"] = '座位關鍵字'
 
     zh_tw["keyword_exclude"] = '排除關鍵字'
     zh_tw["keyword_usage"] = '每組關鍵字需要雙引號, 用逗號分隔, \n在關鍵字中使用空格作為 AND 邏輯。\n加入 ,\"\" 代表符合所有關鍵字'
@@ -209,6 +217,10 @@ def load_translate():
     zh_cn["time_select_order"] = '时间排序方式'
     zh_cn["time_keyword"] = '时间关键字'
 
+    zh_cn["seat_auto_select"] = '座位区域自动选择'
+    zh_cn["seat_select_order"] = '座位排序方式'
+    zh_cn["seat_keyword"] = '座位关键字'
+
     zh_cn["keyword_exclude"] = '排除关键字'
     zh_cn["keyword_usage"] = '每组关键字需要双引号, 用逗号分隔, \n在关键字中使用空格作为 AND 逻辑。\n附加 ,\"\" 以匹配所有结果。'
 
@@ -279,6 +291,10 @@ def load_translate():
     ja_jp["time_auto_select"] = '时间自動選択'
     ja_jp["time_select_order"] = '時間のソート方法'
     ja_jp["time_keyword"] = '時間キーワード'
+
+    ja_jp["seat_auto_select"] = '座席エリア自動選択'
+    ja_jp["seat_select_order"] = '座席ソート方法'
+    ja_jp["seat_keyword"] = '座席キーワード'
 
     ja_jp["keyword_exclude"] = '除外キーワード'
     ja_jp["keyword_usage"] = '各キーワードはカンマで区切られた二重引用符が必要です。\nキーワード内のスペースを AND ロジックとして使用します。\nすべてに一致するように ,\"\" を追加します。'
@@ -417,6 +433,11 @@ def get_default_config():
     config_dict["time_auto_select"]["enable"] = True
     config_dict["time_auto_select"]["time_keyword"] = ""
     config_dict["time_auto_select"]["mode"] = CONST_SELECT_ORDER_DEFAULT
+
+    config_dict["seat_select"] = {}
+    config_dict["seat_select"]["enable"] = False
+    config_dict["seat_select"]["keyword"] = ""
+    config_dict["seat_select"]["mode"] = CONST_SELECT_ORDER_DEFAULT
 
     config_dict["keyword_exclude"] = "\"Restricted View\""
 
@@ -665,6 +686,15 @@ def btn_save_act(language_code, slience_mode=False):
         time_keyword = format_config_keyword_for_json(time_keyword)
         config_dict["time_auto_select"]["time_keyword"]=time_keyword
 
+        if "seat_select" not in config_dict:
+            config_dict["seat_select"] = {}
+        config_dict["seat_select"]["enable"] = bool(chk_state_seat_auto_select.get())
+        config_dict["seat_select"]["mode"] = combo_seat_auto_select_mode.get().strip()
+
+        seat_keyword = txt_seat_keyword.get("1.0",END).strip()
+        seat_keyword = format_config_keyword_for_json(seat_keyword)
+        config_dict["seat_select"]["keyword"]=seat_keyword
+
         keyword_exclude = txt_keyword_exclude.get("1.0",END).strip()
         keyword_exclude = format_config_keyword_for_json(keyword_exclude)
         config_dict["keyword_exclude"]=keyword_exclude
@@ -686,6 +716,15 @@ def btn_save_act(language_code, slience_mode=False):
                 except Exception as exc:
                     print(exc)
                     messagebox.showinfo(translate[language_code]["save"], "Error:" + translate[language_code]["time_keyword"])
+                    is_all_data_correct = False
+
+        if is_all_data_correct:
+            if len(seat_keyword) > 0:
+                try:
+                    test_array = json.loads("["+ seat_keyword +"]")
+                except Exception as exc:
+                    print(exc)
+                    messagebox.showinfo(translate[language_code]["save"], "Error:" + translate[language_code]["seat_keyword"])
                     is_all_data_correct = False
 
         if is_all_data_correct:
@@ -1072,6 +1111,49 @@ def PreferenctTab(root, config_dict, language_code, UI_PADDING_X):
     txt_time_keyword = Text(frame_group_header, width=30, height=4)
     txt_time_keyword.grid(column=1, row=group_row_count, sticky = W)
     txt_time_keyword.insert("1.0", config_dict["time_auto_select"]["time_keyword"].strip())
+
+    group_row_count+=1
+
+    global lbl_seat_auto_select
+    lbl_seat_auto_select = Label(frame_group_header, text=translate[language_code]['seat_auto_select'])
+    lbl_seat_auto_select.grid(column=0, row=group_row_count, sticky = E)
+
+    global chk_state_seat_auto_select
+    chk_state_seat_auto_select = BooleanVar()
+    chk_state_seat_auto_select.set(config_dict.get("seat_select", {}).get("enable", False))
+
+    global chk_seat_auto_select
+    chk_seat_auto_select = Checkbutton(frame_group_header, text=translate[language_code]['enable'], variable=chk_state_seat_auto_select)
+    chk_seat_auto_select.grid(column=1, row=group_row_count, sticky = W)
+
+    group_row_count+=1
+
+    global seat_auto_select_mode_index
+    seat_auto_select_mode_index = group_row_count
+
+    global lbl_seat_auto_select_mode
+    lbl_seat_auto_select_mode = Label(frame_group_header, text=translate[language_code]['seat_select_order'])
+    lbl_seat_auto_select_mode.grid(column=0, row=seat_auto_select_mode_index, sticky = E)
+
+    global combo_seat_auto_select_mode
+    combo_seat_auto_select_mode = ttk.Combobox(frame_group_header, state="readonly", width=30)
+    combo_seat_auto_select_mode['values']= CONST_SELECT_OPTIONS_DEFAULT
+    combo_seat_auto_select_mode.set(config_dict.get("seat_select", {}).get("mode", CONST_SELECT_ORDER_DEFAULT))
+    combo_seat_auto_select_mode.grid(column=1, row=seat_auto_select_mode_index, sticky = W)
+
+    group_row_count+=1
+
+    global seat_keyword_index
+    seat_keyword_index = group_row_count
+
+    global lbl_seat_keyword
+    lbl_seat_keyword = Label(frame_group_header, text=translate[language_code]['seat_keyword'])
+    lbl_seat_keyword.grid(column=0, row=seat_keyword_index, sticky = E+N)
+
+    global txt_seat_keyword
+    txt_seat_keyword = Text(frame_group_header, width=30, height=4)
+    txt_seat_keyword.grid(column=1, row=group_row_count, sticky = W)
+    txt_seat_keyword.insert("1.0", config_dict.get("seat_select", {}).get("keyword", "").strip())
 
     group_row_count+=1
 

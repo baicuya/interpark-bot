@@ -1027,6 +1027,49 @@ def get_matched_blocks_by_keyword(config_dict, auto_select_mode, keyword_string,
             break
     return matched_blocks
 
+
+def get_seat_option_indices_by_keyword(config_dict, select_obj):
+    seat_config = config_dict.get("seat_select", {})
+    keyword_string = seat_config.get("keyword", "")
+    if len(keyword_string) == 0:
+        return []
+
+    matched_indices = []
+    try:
+        keyword_array = json.loads("[" + keyword_string + "]")
+    except Exception:
+        keyword_array = []
+
+    for keyword_item_set in keyword_array:
+        keyword_item = format_keyword_string(keyword_item_set)
+        if len(keyword_item) == 0:
+            continue
+        for idx, option in enumerate(select_obj.options):
+            option_text = ""
+            try:
+                option_text = option.text
+            except Exception:
+                option_text = ""
+            if option_text is None:
+                option_text = ""
+            if keyword_item in format_keyword_string(option_text):
+                matched_indices.append(idx)
+        if len(matched_indices) > 0:
+            break
+
+    return matched_indices
+
+
+def choose_index_by_mode(mode, indices):
+    if len(indices) == 0:
+        return None
+    if mode == CONST_FROM_BOTTOM_TO_TOP:
+        return indices[-1]
+    if mode == CONST_RANDOM:
+        return random.choice(indices)
+    return indices[0]
+
+
 def is_row_match_keyword(keyword_string, row_text):
     # clean stop word.
     row_text = format_keyword_string(row_text)
@@ -1737,7 +1780,7 @@ def interpark_divBookSeat(driver, config_dict, ocr):
             except Exception as exc:
                 pass
 
-def interpart_price_seat_count(div_element):
+def interpart_price_seat_count(div_element, config_dict):
     is_seat_assigned = False
     print("interpart_price_seat_count")
     try:
@@ -1745,14 +1788,29 @@ def interpart_price_seat_count(div_element):
             if div_element.is_displayed():
                 select_obj = Select(div_element)
                 if not select_obj is None:
-                    seat_count = 0
                     seat_count_options = select_obj.options
-                    if not seat_count_options is None:
-                        seat_count = len(seat_count_options)
+                    if seat_count_options is None:
+                        return False
 
+                    seat_count = len(seat_count_options)
                     print("seat_count", seat_count)
-                    if seat_count > 0:
-                        select_obj.select_by_index(seat_count-1)
+                    if seat_count == 0:
+                        return False
+
+                    seat_config = config_dict.get("seat_select", {})
+                    seat_enable = bool(seat_config.get("enable", False))
+                    selected_index = None
+
+                    if seat_enable:
+                        matched_indices = get_seat_option_indices_by_keyword(config_dict, select_obj)
+                        selected_index = choose_index_by_mode(seat_config.get("mode", CONST_SELECT_ORDER_DEFAULT), matched_indices)
+                        if selected_index is None:
+                            selected_index = seat_count - 1
+                    else:
+                        selected_index = seat_count - 1
+
+                    if selected_index is not None and selected_index >= 0 and selected_index < seat_count:
+                        select_obj.select_by_index(selected_index)
                         is_seat_assigned = True
 
     except Exception as exc:
@@ -1786,7 +1844,7 @@ def interpart_booking_click_small_next_btn(driver):
 
     return is_step_3_submited
 
-def interpark_assign_seat_count(driver):
+def interpark_assign_seat_count(driver, config_dict):
     is_seat_assigned = False
     
     div_element_list = None
@@ -1796,7 +1854,7 @@ def interpark_assign_seat_count(driver):
             print("select count:", len(div_element_list))
             if len(div_element_list) > 0:
                 for div_element in div_element_list:
-                    is_seat_assigned = interpart_price_seat_count(div_element)
+                    is_seat_assigned = interpart_price_seat_count(div_element, config_dict)
                     print("is_seat_assigned:", is_seat_assigned)
     except Exception as exc:
         if show_debug_message:
