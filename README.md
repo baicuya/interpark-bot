@@ -17,23 +17,42 @@
 
 # 使用方法
 
-## 环境准备
+## 1. 克隆仓库
+如果你还没有仓库代码，请先执行：
+```bash
+git clone https://github.com/baicuya/interpark-bot.git
+cd interpark-bot
+```
+
+## 2. 环境准备
 1. 安装 Python: https://www.python.org/downloads/
 
-2. 安装依赖包:
+2. 安装依赖包：
 ```bash
 pip install -r pip-req.txt
 ```
 
-3. 运行配置界面:
+## 3. 配置程序
+运行图形设置界面：
 ```bash
 python settings.py
 ```
+在打开的界面里：
+1. 填写 `homepage` 为你的 Interpark 票务页面链接
+2. 填写账号、密码、个人信息、信用卡信息
+3. 根据需要启用日期/时间自动选择
+4. 如果需要自动选区，请启用 `seat_select` 并填写关键字
+5. 点击“存档”保存配置
 
-4. 运行抢票程序:
+## 4. 运行抢票程序
 ```bash
 python interpark_bot.py
 ```
+
+## 5. 常见新手提示
+- 如果你使用的是 M1/M2 Mac，`ddddocr` 可能不能用，建议关闭 `ocr_captcha.enable`
+- 运行前最好先确认 `settings.json` 已正确保存
+- 如果你不确定浏览器 WebDriver 版本，先运行 `python settings.py` 并检查日志
 
 # 配置文件说明
 
