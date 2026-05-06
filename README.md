@@ -22,7 +22,7 @@
 
 2. 安装依赖包:
 ```bash
-pip install selenium chromedriver-autoinstaller
+pip install -r pip-req.txt
 ```
 
 3. 运行配置界面:
