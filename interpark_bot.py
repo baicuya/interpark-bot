@@ -57,6 +57,7 @@ CONST_INTERPARK_SIGN_IN_URL = "https://www.globalinterpark.com/user/signin"
 
 CONST_CHROME_VERSION_NOT_MATCH_EN="Please download the WebDriver version to match your browser version."
 CONST_CHROME_VERSION_NOT_MATCH_TW="請下載與您瀏覽器相同版本的WebDriver版本，或更新您的瀏覽器版本。"
+CONST_CHROME_DRIVER_URL = "https://googlechromelabs.github.io/chromedriver/latest.json"
 
 CONST_FROM_TOP_TO_BOTTOM = u"from top to bottom"
 CONST_FROM_BOTTOM_TO_TOP = u"from bottom to top"
@@ -142,9 +143,23 @@ def get_favoriate_extension_path(webdriver_path):
     return extension_list
 
 def get_chromedriver_path(webdriver_path):
+    # First check for direct path
     chromedriver_path = os.path.join(webdriver_path,"chromedriver")
     if platform.system().lower()=="windows":
         chromedriver_path = os.path.join(webdriver_path,"chromedriver.exe")
+
+    # If not found, look in versioned subdirectory
+    if not os.path.exists(chromedriver_path):
+        for item in os.listdir(webdriver_path):
+            item_path = os.path.join(webdriver_path, item)
+            if os.path.isdir(item_path):
+                candidate = os.path.join(item_path, "chromedriver")
+                if platform.system().lower()=="windows":
+                    candidate = os.path.join(item_path, "chromedriver.exe")
+                if os.path.exists(candidate):
+                    chromedriver_path = candidate
+                    break
+
     return chromedriver_path
 
 def get_brave_bin_path():
@@ -227,14 +242,14 @@ def load_chromdriver_normal(config_dict, driver_type):
 
     if not os.path.exists(chromedriver_path):
         print("WebDriver not exist, try to download to:", webdriver_path)
-        chromedriver_autoinstaller.install(path=webdriver_path, make_version_dir=False)
+        chromedriver_autoinstaller.install(path=webdriver_path)
     else:
         print("ChromeDriver exist:", chromedriver_path)
 
     if not os.path.exists(chromedriver_path):
         print("Please download chromedriver and extract zip to webdriver folder from this url:")
         print("請下在面的網址下載與你chrome瀏覽器相同版本的chromedriver,解壓縮後放到webdriver目錄裡：")
-        print(URL_CHROME_DRIVER)
+        print(CONST_CHROME_DRIVER_URL)
     else:
         chrome_service = Service(chromedriver_path)
         chrome_options = get_chrome_options(webdriver_path, config_dict["advanced"]["adblock_plus_enable"], browser=config_dict["browser"], headless=config_dict["advanced"]["headless"])
@@ -261,7 +276,7 @@ def load_chromdriver_normal(config_dict, driver_type):
                     print(exc2)
                     pass
 
-                chromedriver_autoinstaller.install(path=webdriver_path, make_version_dir=False)
+                chromedriver_autoinstaller.install(path=webdriver_path)
                 chrome_service = Service(chromedriver_path)
                 try:
                     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
@@ -345,7 +360,7 @@ def load_chromdriver_uc(config_dict):
 
     if not os.path.exists(chromedriver_path):
         print("ChromeDriver not exist, try to download to:", webdriver_path)
-        chromedriver_autoinstaller.install(path=webdriver_path, make_version_dir=False)
+        chromedriver_autoinstaller.install(path=webdriver_path)
     else:
         print("ChromeDriver exist:", chromedriver_path)
 
@@ -415,7 +430,7 @@ def load_chromdriver_uc(config_dict):
                 print(exc2)
                 pass
 
-            chromedriver_autoinstaller.install(path=webdriver_path, make_version_dir=False)
+            chromedriver_autoinstaller.install(path=webdriver_path)
             try:
                 driver = uc.Chrome(driver_executable_path=chromedriver_path, options=options, headless=config_dict["advanced"]["headless"])
             except Exception as exc2:

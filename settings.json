@@ -1,0 +1,43 @@
+{
+    "homepage": "https://www.globalinterpark.com/",
+    "browser": "chrome",
+    "webdriver_type": "selenium",
+    "locale": "中文",
+    "language": "zh_TW",
+    "advanced": {
+        "verbose": true,
+        "headless": false,
+        "adblock_plus_enable": false,
+        "interpark_account": "",
+        "interpark_password": "",
+        "facebook_account": "",
+        "facebook_password": ""
+    },
+    "date_auto_select": {
+        "enable": false,
+        "mode": "from top to bottom",
+        "date_keyword": ""
+    },
+    "time_auto_select": {
+        "enable": false,
+        "mode": "from top to bottom",
+        "time_keyword": ""
+    },
+    "keyword_exclude": "",
+    "user_name": "",
+    "user_date_of_birth_year": "",
+    "user_date_of_birth_month": "",
+    "user_date_of_birth_day": "",
+    "user_email": "",
+    "user_phone_number": "",
+    "user_cell_phone": "",
+    "foreign_card": false,
+    "credit_card_type": "",
+    "cc_number": "",
+    "cc_exp_month": "",
+    "cc_exp_year": "",
+    "ocr_captcha": {
+        "enable": false,
+        "beta": false
+    }
+}

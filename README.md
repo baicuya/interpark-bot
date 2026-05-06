@@ -1,66 +1,121 @@
-# Max interpark 搶票機器人
-help you quickly fill your order form online.
+# Interpark 抢票机器人
+自动填表工具，帮助快速填写订单信息。
 
-好多人想去看韓國追星，或是去看《英雄聯盟》世界賽，我寫了一個自動填表單的小程式，能幫你搶票更順利。
+在公用的电脑，建议不要填入自己所有的信用卡资料，以避免个人的资料遭其他共用电脑的使用者被盗用。
 
-如果是在公用的電腦，建議不要填入自己所有的信用卡資料，以避免個人的資料遭其他共用電腦的使用者被盜用。
+目前抢票机器人因为 CloudFlare 已无法使用, 需要找时间把脚本从 selenium 改写为 DrissionPage 或 nodriver 格式。
 
-目前搶票機器人因為 CloudFlare 已無法使用, 需要找時間把腳本從 selenium 改寫為 DrissionPage 或 nodriver 格式:
+# 功能
+* 自动登录 interpark 或 facebook 账号。
+* 会自动按「Buy Tickets」的按钮。
+* 自动选取第1个可以购买的场次。
+* 自动选取第1个可以购买的时间。
+* 自动关闭「Booking Info」信息框。
+* 自动关闭「Secure Booking service」说明信息框。
+* 自动填入个人/信用卡资料。
+* 自动勾选 I agree。
 
-* https://github.com/g1879/DrissionPage/
-* https://github.com/ultrafunkamsterdam/nodriver
+# 使用方法
 
+## 环境准备
+1. 安装 Python: https://www.python.org/downloads/
 
+2. 安装依赖包:
+```bash
+pip install selenium chromedriver-autoinstaller
+```
 
-# Demo (示範影片)
+3. 运行配置界面:
+```bash
+python settings.py
+```
 
-Max Interpark Bot 2023-08-31 自動填表單與勾選
+4. 运行抢票程序:
+```bash
+python interpark_bot.py
+```
 
-https://youtu.be/UKgGG2nZPk0
+# 配置文件说明
 
-Max Interpark Bot 2023-08-01 自動驗證碼
+配置文件为 `settings.json`，可通过 `python settings.py` 图形界面配置，也可手动编辑。
 
-https://youtu.be/2bFhGDBXIBE
+## 基本设置
 
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `homepage` | 要访问的页面URL（票务页面链接） | `https://www.globalinterpark.com/product/23010160?lang=zh-CN` |
+| `browser` | 浏览器类型 | `chrome` (可选: chrome, brave, edge, safari, firefox) |
+| `webdriver_type` | WebDriver类型 | `selenium` (可选: selenium, undetected_chromedriver) |
+| `locale` | 网站语言 | `中文` (可选: 中文, 한국어, 日本語) |
+| `language` | 界面语言 | `zh_TW` (可选: zh_TW, en_US, ko_KR, ja_JP) |
 
+## 高级设置 (advanced)
 
-# Feature (主要功能)
-* 自動登入 interpark 或 facebook 帳號。
-* 會自動按「But Tickets」的按鈕。
-* 自動選取第1個可以購買的場次。
-* 自動選取第1個可以購買的時間。
-* 自動關閉「Booking Info」訊息框框。
-* 自動關閉「Secure Booking service」說明訊息框框。
-* 自動猜測與輸入驗證碼，需要人工手動地點擊輸入。驗證碼可能會猜錯。
-* 自動填入個人/信用卡資料。
-* 自動勾選 I agree。
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `verbose` | 调试模式，显示详细日志 | `false` |
+| `headless` | 无头模式（不显示浏览器） | `false` 建议设为 false 方便查看 |
+| `adblock_plus_enable` | 启用广告拦截插件 | `false` |
+| `interpark_account` | Interpark账号（用于自动登录） | `your@email.com` |
+| `interpark_password` | Interpark密码 | 密码 |
+| `facebook_account` | Facebook账号（备用登录） | `your@email.com` |
+| `facebook_password` | Facebook密码 | 密码 |
 
+## 日期/时间自动选择
 
-# How to use (如何使用)
-https://max-everyday.com/2023/08/interpark-bot/
+### date_auto_select (日期选择)
 
-# How to execute source code (透過原始碼的執行方法)
-1: install latest version python:
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `enable` | 是否启用自动选日期 | `true` / `false` |
+| `mode` | 选日期方式 | `from top to bottom` / `from bottom to top` / `random` |
+| `date_keyword` | 日期关键字（留空选第一个） | `2024-12-25` 或 `25` |
 
-https://www.python.org/downloads/
+### time_auto_select (时间选择)
 
-2: install dependency packages:
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `enable` | 是否启用自动选时间 | `true` / `false` |
+| `mode` | 选时间方式 | `from top to bottom` / `from bottom to top` / `random` |
+| `time_keyword` | 时间关键字（留空选第一个） | `19:00` 或 `晚上7点` |
 
-<code>python -m pip install selenium</code>
+## 个人信息（必填）
 
-3: run config interface:
+| 字段 | 说明 |
+|------|------|
+| `user_name` | 真实姓名（必须与信用卡持卡人一致） |
+| `user_date_of_birth_year` | 出生年份（4位数），如 `1990` |
+| `user_date_of_birth_month` | 出生月份（2位数），如 `01` |
+| `user_date_of_birth_day` | 出生日期（2位数），如 `15` |
+| `user_email` | 电子邮箱 |
+| `user_phone_number` | 联系电话 |
+| `user_cell_phone` | 手机号码 |
 
-<code>python settings.py</code>
+## 支付信息（必填）
 
+| 字段 | 说明 |
+|------|------|
+| `foreign_card` | 是否是外国信用卡 (`true`=外国卡, `false`=韩国本地卡) |
+| `credit_card_type` | 信用卡类型（外国卡填写），如 `VISA`, `MASTER`, `JCB` |
+| `cc_number` | 信用卡号（16位） |
+| `cc_exp_month` | 信用卡过期月份（2位数），如 `12` |
+| `cc_exp_year` | 信用卡过期年份（4位数），如 `2025` |
 
-# Introduce the implement (實作方法)
-https://stackoverflow.max-everyday.com/2018/03/selenium-chrome-webdriver/
+## 验证码识别
 
-# Execute suggestion (填表單建議)
-限量的訂位系統的是殘酷的，建議不要用破舊的電腦或連線不穩的手機網路來搶，因為只要比別人慢個 0.1 秒，名額可能就沒了。為了要搶到限量的名額真心建議去網咖或找一個網路連線穩定且快的地方並使用硬體不差的電腦來搶位子。
+| 字段 | 说明 |
+|------|------|
+| `ocr_captcha.enable` | 是否启用自动识别验证码 (`需要安装 ddddocr`) |
+| `ocr_captcha.beta` | 是否使用 beta 版模型（识别率更高） |
 
-如果你在使用上有遇到問題，建議先看看下面這篇文章裡的問題排除，因為 MaxBot 和 Max Interpark Bot 用的程式幾乎一樣: https://max-everyday.com/2018/03/tixcraft-bot/
+> 注意：`ddddocr` 仅支持 Intel CPU，ARM (M1/M2) Mac 无法使用
 
-# Donate (贊助Max)
-如果你覺得這篇文章或MaxBot寫的很好，想打賞Max，贊助方式如下： https://max-everyday.com/about/#donate
+## 其他设置
 
+| 字段 | 说明 |
+|------|------|
+| `keyword_exclude` | 排除关键字，带有这些关键字的场次会被排除，多个用逗号分隔，如 `VIP,最贵` |
+
+# 建议
+
+限量的订位系统是残酷的，建议不要用破旧电脑或连线不稳的手机网络来抢，因为只要比别人慢个 0.1 秒，名额可能就没了。为了要抢到限量的名额，真心建议去网咖或找一个网络连线稳定且快的地方并使用硬件不差的电脑来抢位子。
